@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chúc Mừng Ngày 20/10 🌹</title>
+    
+    <!-- Google Fonts hỗ trợ tiếng Việt trọn vẹn -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Chính -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Meta Open Graph -->
+    <meta property="og:title" content="Chúc Mừng 20/10 🌹">
+    <meta property="og:description" content="Một món quà đặc biệt gửi trọn yêu thương đến bạn...">
+    <meta property="og:image" content="anh-preview.jpg">
+</head>
+<body>
+
+    <!-- 1. Canvas hạt particle 60fps lung linh nhất -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- 2. Flash bùng nổ siêu tân tinh -->
+    <div id="flash-overlay"></div>
+
+    <!-- 3. Lớp Intro mở đầu hoành tráng (chạm hoặc tự động chạy) -->
+    <div id="intro-overlay">
+        <div class="intro-core">
+            <div class="intro-core-inner"></div>
+            <i class="fas fa-heart"></i>
+            <div class="intro-ring"></div>
+            <div class="intro-ring" style="animation-delay: 0.6s;"></div>
+            <div class="intro-ring" style="animation-delay: 1.2s;"></div>
+        </div>
+        <div class="intro-hint">
+            <i class="fas fa-wand-magic-sparkles"></i> Chạm để mở món quà bí mật 20/10 ✨
+        </div>
+    </div>
+
+    <!-- 4. Nội dung chính: Thiệp chúc mừng lộng lẫy -->
+    <div class="container" id="main-content">
+        <div class="greeting-card">
+            <!-- Khung ảnh kỷ niệm -->
+            <div class="image-wrapper">
+                <img src="my-image.jpg" alt="Ảnh kỷ niệm 20/10" class="top-image" id="featured-img">
+            </div>
+
+            <!-- Dòng chữ gõ máy typewriter -->
+            <h1 id="main-message"></h1> 
+            
+            <!-- Tên người nhận hiển thị trang trọng, lung linh -->
+            <h2 id="name-element">Hoài Nhi</h2>
+            
+            <!-- Lời chúc yêu thương trọn vẹn -->
+            <p id="final-wish"></p>
+        </div>
+    </div>
+
+    <!-- 5. Trình phát nhạc cao cấp Glassmorphism -->
+    <div id="music-player">
+        <div class="song-info">
+            <div class="cover-wrapper">
+                <img id="cover-art" src="cover1.jpg" alt="Ảnh bài hát">
+            </div>
+            <div class="song-details">
+                <div id="song-title">Đang nạp bài hát...</div>
+                <div class="song-status">
+                    <span class="status-dot"></span>
+                    <span id="player-status-text">Chúc mừng 20/10</span>
+                </div>
+            </div>
+            <!-- Nút thu nhỏ player cho mobile -->
+            <button id="player-toggle-btn" title="Thu nhỏ / Phóng to">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <!-- Thanh tiến độ & thời gian phát nhạc -->
+        <div class="progress-container">
+            <span id="current-time">0:00</span>
+            <div class="progress-bar-bg" id="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <span id="total-duration">0:00</span>
+        </div>
+
+        <!-- Các nút điều khiển nhạc -->
+        <div class="controls">
+            <div class="button-group">
+                <button id="shuffle-btn" title="Phát ngẫu nhiên"><i class="fas fa-random"></i></button>
+                <button id="prev-btn" title="Bài trước"><i class="fas fa-backward-step"></i></button>
+                <button id="play-pause-btn" title="Phát / Dừng"><i class="fas fa-play"></i></button> 
+                <button id="next-btn" title="Bài kế tiếp"><i class="fas fa-forward-step"></i></button>
+                <button id="repeat-btn" title="Lặp lại"><i class="fas fa-repeat"></i></button>
+            </div>
+            
+            <div class="volume-group">
+                <button id="mute-btn" title="Bật/Tắt tiếng"><i class="fas fa-volume-down"></i></button> 
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" title="Âm lượng 50%">
+            </div>
+        </div>
+        <audio id="audio-player" preload="metadata"></audio>
+    </div>
+
+    <!-- 6. Nút thông báo bật nhạc tinh tế (nếu trình duyệt chặn autoplay) -->
+    <div id="music-player-note">
+        <i class="fas fa-music"></i>
+        <span>Chạm vào đây để bật nhạc 50%</span>
+        <i class="fas fa-arrow-right"></i>
+    </div>
+    
+    <script>
+        /* =========================================================================
+           ⚙️ KHU VỰC CẤU HÌNH & TÙY CHỈNH DÀNH CHO BẠN
+           ========================================================================= */
+
+        // 1. Tùy chỉnh danh sách bài hát & THỜI ĐIỂM BẮT ĐẦU (tính theo giây)
+        // 👉 HƯỚNG DẪN:
+        //    - 'startTime': số giây bài hát bắt đầu phát (VD: 30 = giây thứ 30 đoạn hay nhất).
+        //    - Nếu muốn phát từ đầu bài hát, để: startTime: 0
+        const playlist = [
+            { 
+                title: 'Khang Rồng', 
+                src: 'song1.mp3', 
+                cover: 'cover1.jpg',
+                startTime: 0 // << TÙY CHỈNH THỜI GIAN BẮT ĐẦU (GIÂY) CHO BÀI 1 TẠI ĐÂY
+            },
+            { 
+                title: 'Miniskirt - AOA', 
+                src: 'song2.mp3', 
+                cover: 'cover2.jpg',
+                startTime: 0 // << TÙY CHỈNH THỜI GIAN BẮT ĐẦU (GIÂY) CHO BÀI 2 TẠI ĐÂY
+            },
+            { 
+                title: 'AEAO - Dynamic Duo', 
+                src: 'song3.mp3', 
+                cover: 'cover3.jpg',
+                startTime: 0 // << TÙY CHỈNH THỜI GIAN BẮT ĐẦU (GIÂY) CHO BÀI 3 TẠI ĐÂY
+            },
+        { 
+                title: 'Haru Haru', 
+                src: 'song4.mp3', 
+                cover: 'cover4.jpg',
+                startTime: 10 // << TÙY CHỈNH THỜI GIAN BẮT ĐẦU (GIÂY) CHO BÀI 4 TẠI ĐÂY
+            }
+        ];
+
+        // 2. Mức âm lượng mặc định sau khi xong intro: 0.5 tương đương 50%
+        const DEFAULT_VOLUME = 0.5;
+
+        // 3. Nội dung lời chúc hiển thị
+        const mainMessageText = "Chúc mừng ngày 20/10, ngày Phụ nữ Việt Nam 🌹";
+        const finalWishContent = '<i>Duy Quý, ông trùm mafia internet số 1 Việt Nam,<br> xin chúc bà vạn sự như ý, tỷ sự như mơ, triệu triệu bất ngờ, ngập tràn hạnh phúc, <br>chúc bà 8386 mãi đỉnh mãi đỉnh mãi đỉnh ✨💖</i>';
+
+
+        /* =========================================================================
+           ✨ HỆ THỐNG CANVAS PARTICLE ENGINE (SIÊU TÂN TINH, HOA HỒNG, TRÁI TIM, PHÁO HOA)
+           Đảm bảo 60FPS cực mượt mà trên cả PC và Điện thoại
+           ========================================================================= */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = 0;
+        let height = 0;
+        let dpr = 1;
+
+        function resizeCanvas() {
+            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Bảng màu lung linh phát sáng
+        const GLOW_COLORS = ['#ff4d88', '#ff758c', '#ff85a2', '#ffd166', '#ffb703', '#4cc9f0', '#7209b7', '#ffffff'];
+
+        // Các mảng hạt cho từng hiệu ứng
+        let vortexParticles = [];
+        let explosionParticles = [];
+        let shockwaves = [];
+        let petals = [];
+        let floatingHearts = [];
+        let stardust = [];
+        let sparklesTrail = [];
+        let shootingStars = [];
+
+        let introPhase = 'vortex'; // 'vortex' -> 'exploded' -> 'ambient'
+        let introStartTime = 0;
+        let isIntroFinished = false;
+
+        // Khởi tạo hạt xoáy tụ ban đầu
+        function initVortexParticles() {
+            vortexParticles = [];
+            const count = width < 768 ? 160 : 260;
+            const cx = width / 2;
+            const cy = height / 2;
+            const maxRadius = Math.max(width, height) * 0.75;
+
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * maxRadius + 60;
+                vortexParticles.push({
+                    x: cx + Math.cos(angle) * radius,
+                    y: cy + Math.sin(angle) * radius,
+                    angle: angle,
+                    radius: radius,
+                    speed: Math.random() * 0.04 + 0.02,
+                    radialSpeed: (Math.random() * 2.5 + 2) * (maxRadius / 700),
+                    size: Math.random() * 3 + 1.5,
+                    color: GLOW_COLORS[Math.floor(Math.random() * GLOW_COLORS.length)],
+                    trail: []
+                });
+            }
+        }
+
+        // Kích hoạt vụ nổ SIÊU TÂN TINH (SUPERNOVA EXPLOSION)
+        function triggerSupernova() {
+            introPhase = 'exploded';
+            const cx = width / 2;
+            const cy = height / 2;
+
+            // Flash lóe sáng toàn màn hình
+            const flash = document.getElementById('flash-overlay');
+            flash.style.opacity = '1';
+            setTimeout(() => { flash.style.opacity = '0'; }, 300);
+
+            // 1. Sóng xung kích ánh sáng lan tỏa
+            shockwaves.push({
+                x: cx,
+                y: cy,
+                radius: 10,
+                maxRadius: Math.max(width, height) * 1.3,
+                color: '#ff4d88',
+                lineWidth: 18,
+                alpha: 1,
+                speed: 38
+            });
+            setTimeout(() => {
+                shockwaves.push({
+                    x: cx,
+                    y: cy,
+                    radius: 10,
+                    maxRadius: Math.max(width, height) * 1.1,
+                    color: '#ffd166',
+                    lineWidth: 12,
+                    alpha: 0.9,
+                    speed: 30
+                });
+            }, 120);
+
+            // 2. Hàng trăm mảnh pháo hoa bốc tỏa 360 độ
+            explosionParticles = [];
+            const burstCount = width < 768 ? 220 : 380;
+            for (let i = 0; i < burstCount; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * (width < 768 ? 13 : 18) + 3;
+                explosionParticles.push({
+                    x: cx,
+                    y: cy,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    gravity: 0.05,
+                    friction: 0.965,
+                    size: Math.random() * 4.5 + 1.8,
+                    color: GLOW_COLORS[Math.floor(Math.random() * GLOW_COLORS.length)],
+                    alpha: 1,
+                    decay: Math.random() * 0.012 + 0.008,
+                    isHeart: Math.random() < 0.25
+                });
+            }
+
+            // 3. Bắn thêm 4 chùm pháo hoa phụ rải rác
+            const subFireworkDelay = [250, 500, 750, 1000];
+            subFireworkDelay.forEach(delay => {
+                setTimeout(() => {
+                    const sx = Math.random() * (width * 0.7) + width * 0.15;
+                    const sy = Math.random() * (height * 0.5) + height * 0.15;
+                    createHeartFirework(sx, sy, 50);
+                }, delay);
+            });
+
+            // 4. Khởi tạo cánh hoa hồng & trái tim nền
+            initAmbientParticles();
+
+            // 5. Kết thúc Intro & Bắt đầu phát nhạc + Gõ chữ
+            setTimeout(() => {
+                finishIntroSequence();
+            }, 1200);
+        }
+
+        // Tạo chùm pháo hoa trái tim mini
+        function createHeartFirework(x, y, count = 40) {
+            const colors = ['#ff4d88', '#ff85a2', '#ffd166', '#ffffff', '#4cc9f0'];
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 7 + 2;
+                explosionParticles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    gravity: 0.06,
+                    friction: 0.96,
+                    size: Math.random() * 3.5 + 1.5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1,
+                    decay: Math.random() * 0.018 + 0.012,
+                    isHeart: Math.random() < 0.3
+                });
+            }
+        }
+
+        // Khởi tạo các hạt nền (Cánh hoa rơi, Trái tim, Bụi sao)
+        function initAmbientParticles() {
+            petals = [];
+            floatingHearts = [];
+            stardust = [];
+
+            // Cánh hoa hồng rơi
+            const petalCount = width < 768 ? 24 : 45;
+            for (let i = 0; i < petalCount; i++) {
+                petals.push(createPetal(true));
+            }
+
+            // Trái tim bay từ dưới lên
+            const heartCount = width < 768 ? 16 : 28;
+            for (let i = 0; i < heartCount; i++) {
+                floatingHearts.push(createFloatingHeart(true));
+            }
+
+            // Bụi sao lấp lánh (Stardust)
+            const starCount = width < 768 ? 40 : 80;
+            for (let i = 0; i < starCount; i++) {
+                stardust.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2.5 + 0.8,
+                    baseAlpha: Math.random() * 0.6 + 0.2,
+                    speed: Math.random() * 0.03 + 0.01,
+                    angle: Math.random() * Math.PI * 2,
+                    color: Math.random() < 0.5 ? '#ffffff' : (Math.random() < 0.5 ? '#ffc2d1' : '#ffd166')
+                });
+            }
+        }
+
+        function createPetal(randomY = false) {
+            return {
+                x: Math.random() * width,
+                y: randomY ? Math.random() * height : -25,
+                size: Math.random() * 12 + 10,
+                speedY: Math.random() * 1.5 + 0.8,
+                speedX: Math.random() * 1.2 - 0.6,
+                angle: Math.random() * Math.PI * 2,
+                angleSpeed: (Math.random() - 0.5) * 0.04,
+                flip: Math.random() * Math.PI * 2,
+                flipSpeed: Math.random() * 0.03 + 0.02,
+                alpha: Math.random() * 0.4 + 0.6
+            };
+        }
+
+        function createFloatingHeart(randomY = false) {
+            return {
+                x: Math.random() * width,
+                y: randomY ? Math.random() * height : height + 30,
+                size: Math.random() * 14 + 10,
+                speedY: Math.random() * 1.4 + 0.6,
+                oscillation: Math.random() * 0.03 + 0.015,
+                oscillationDist: Math.random() * 40 + 20,
+                startX: Math.random() * width,
+                alpha: Math.random() * 0.5 + 0.4,
+                color: Math.random() < 0.6 ? '#ff4d88' : (Math.random() < 0.5 ? '#ff85a2' : '#ffd166')
+            };
+        }
+
+        // Vẽ hình trái tim bằng Canvas Path
+        function drawHeart(ctx, x, y, size, color, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            const top = size * 0.3;
+            ctx.moveTo(x, y + top);
+            ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + top);
+            ctx.bezierCurveTo(x - size / 2, y + (size + top) / 2, x, y + size, x, y + size);
+            ctx.bezierCurveTo(x, y + size, x + size / 2, y + (size + top) / 2, x + size / 2, y + top);
+            ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + top);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Vẽ cánh hoa hồng mềm mại xoay 3D
+        function drawPetal(ctx, p) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+            ctx.scale(1, Math.cos(p.flip));
+            ctx.globalAlpha = p.alpha;
+
+            const grad = ctx.createLinearGradient(0, -p.size, 0, p.size);
+            grad.addColorStop(0, '#ff4d88');
+            grad.addColorStop(0.6, '#ff85a2');
+            grad.addColorStop(1, '#ffccd5');
+            ctx.fillStyle = grad;
+
+            ctx.beginPath();
+            ctx.moveTo(0, -p.size);
+            ctx.bezierCurveTo(p.size * 0.7, -p.size * 0.4, p.size * 0.8, p.size * 0.6, 0, p.size);
+            ctx.bezierCurveTo(-p.size * 0.8, p.size * 0.6, -p.size * 0.7, -p.size * 0.4, 0, -p.size);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Vẽ hạt lấp lánh (Sparkle Star)
+        function drawSparkle(ctx, x, y, size, color, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            for (let i = 0; i < 4; i++) {
+                const a = (i * Math.PI) / 2;
+                ctx.lineTo(x + Math.cos(a) * size, y + Math.sin(a) * size);
+                const a2 = a + Math.PI / 4;
+                ctx.lineTo(x + Math.cos(a2) * (size * 0.25), y + Math.sin(a2) * (size * 0.25));
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Vòng lặp Render hạt 60FPS
+        let lastFrameTime = performance.now();
+        function renderParticles(time) {
+            requestAnimationFrame(renderParticles);
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. GIAI ĐOẠN INTRO: HỘI TỤ XOÁY VỀ TÂM
+            if (introPhase === 'vortex') {
+                const cx = width / 2;
+                const cy = height / 2;
+                ctx.globalCompositeOperation = 'lighter';
+
+                for (let i = vortexParticles.length - 1; i >= 0; i--) {
+                    const p = vortexParticles[i];
+                    p.angle += p.speed;
+                    p.radius -= p.radialSpeed;
+
+                    p.x = cx + Math.cos(p.angle) * p.radius;
+                    p.y = cy + Math.sin(p.angle) * p.radius;
+
+                    // Lưu vệt sáng chuyển động
+                    p.trail.unshift({ x: p.x, y: p.y });
+                    if (p.trail.length > 5) p.trail.pop();
+
+                    // Vẽ vệt đuôi
+                    ctx.beginPath();
+                    for (let j = 0; j < p.trail.length; j++) {
+                        const pt = p.trail[j];
+                        if (j === 0) ctx.moveTo(pt.x, pt.y);
+                        else ctx.lineTo(pt.x, pt.y);
+                    }
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = p.size * 0.7;
+                    ctx.globalAlpha = 0.5;
+                    ctx.stroke();
+
+                    // Vẽ hạt sáng
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = 0.9;
+                    ctx.fill();
+
+                    if (p.radius <= 10) {
+                        vortexParticles.splice(i, 1);
+                    }
+                }
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // 2. SÓNG XUNG KÍCH ÁNH SÁNG
+            if (shockwaves.length > 0) {
+                ctx.save();
+                for (let i = shockwaves.length - 1; i >= 0; i--) {
+                    const sw = shockwaves[i];
+                    sw.radius += sw.speed;
+                    sw.alpha -= 0.022;
+
+                    if (sw.alpha <= 0 || sw.radius >= sw.maxRadius) {
+                        shockwaves.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = sw.color;
+                    ctx.lineWidth = sw.lineWidth * sw.alpha;
+                    ctx.globalAlpha = sw.alpha;
+                    ctx.shadowColor = sw.color;
+                    ctx.shadowBlur = 20;
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            // 3. CÁC HẠT PHÁO HOA BÙNG NỔ
+            if (explosionParticles.length > 0) {
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                for (let i = explosionParticles.length - 1; i >= 0; i--) {
+                    const ep = explosionParticles[i];
+                    ep.x += ep.vx;
+                    ep.y += ep.vy;
+                    ep.vx *= ep.friction;
+                    ep.vy *= ep.friction;
+                    ep.vy += ep.gravity;
+                    ep.alpha -= ep.decay;
+
+                    if (ep.alpha <= 0) {
+                        explosionParticles.splice(i, 1);
+                        continue;
+                    }
+
+                    if (ep.isHeart) {
+                        drawHeart(ctx, ep.x, ep.y, ep.size * 2.5, ep.color, ep.alpha);
+                    } else {
+                        drawSparkle(ctx, ep.x, ep.y, ep.size, ep.color, ep.alpha);
+                    }
+                }
+                ctx.restore();
+            }
+
+            // 4. HẠT AMBIENT: CÁNH HOA HỒNG RƠI 3D
+            if (petals.length > 0) {
+                for (let i = 0; i < petals.length; i++) {
+                    const pt = petals[i];
+                    pt.y += pt.speedY;
+                    pt.x += Math.sin(pt.angle) * 1.2 + pt.speedX;
+                    pt.angle += pt.angleSpeed;
+                    pt.flip += pt.flipSpeed;
+
+                    if (pt.y > height + 25) {
+                        petals[i] = createPetal(false);
+                    }
+                    drawPetal(ctx, pt);
+                }
+            }
+
+            // 5. HẠT AMBIENT: TRÁI TIM BAY LÊN
+            if (floatingHearts.length > 0) {
+                for (let i = 0; i < floatingHearts.length; i++) {
+                    const fh = floatingHearts[i];
+                    fh.y -= fh.speedY;
+                    fh.x = fh.startX + Math.sin(fh.y * fh.oscillation) * fh.oscillationDist;
+
+                    if (fh.y < -30) {
+                        floatingHearts[i] = createFloatingHeart(false);
+                    }
+                    drawHeart(ctx, fh.x, fh.y, fh.size, fh.color, fh.alpha);
+                }
+            }
+
+            // 6. HẠT AMBIENT: BỤI SAO LẤP LÁNH (STARDUST)
+            if (stardust.length > 0) {
+                for (let i = 0; i < stardust.length; i++) {
+                    const s = stardust[i];
+                    s.angle += s.speed;
+                    const a = s.baseAlpha + Math.sin(s.angle) * 0.35;
+                    drawSparkle(ctx, s.x, s.y, s.size, s.color, Math.max(0, Math.min(1, a)));
+                }
+            }
+
+            // 7. VỆT SAO BĂNG THỈNH THOẢNG VÚT QUA
+            if (Math.random() < 0.008 && shootingStars.length < 2) {
+                shootingStars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * (height * 0.4),
+                    length: Math.random() * 80 + 50,
+                    speed: Math.random() * 12 + 10,
+                    angle: Math.PI / 4 + (Math.random() - 0.5) * 0.2,
+                    alpha: 1
+                });
+            }
+
+            if (shootingStars.length > 0) {
+                ctx.save();
+                for (let i = shootingStars.length - 1; i >= 0; i--) {
+                    const ss = shootingStars[i];
+                    ss.x += Math.cos(ss.angle) * ss.speed;
+                    ss.y += Math.sin(ss.angle) * ss.speed;
+                    ss.alpha -= 0.02;
+
+                    if (ss.alpha <= 0) {
+                        shootingStars.splice(i, 1);
+                        continue;
+                    }
+
+                    const grad = ctx.createLinearGradient(
+                        ss.x, ss.y,
+                        ss.x - Math.cos(ss.angle) * ss.length,
+                        ss.y - Math.sin(ss.angle) * ss.length
+                    );
+                    grad.addColorStop(0, `rgba(255, 255, 255, ${ss.alpha})`);
+                    grad.addColorStop(0.4, `rgba(255, 133, 162, ${ss.alpha * 0.6})`);
+                    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+                    ctx.beginPath();
+                    ctx.moveTo(ss.x, ss.y);
+                    ctx.lineTo(
+                        ss.x - Math.cos(ss.angle) * ss.length,
+                        ss.y - Math.sin(ss.angle) * ss.length
+                    );
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            // 8. TƯƠNG TÁC CHUỘT / CẢM ỨNG: VỆT BỤI MA THUẬT (SPARKLES TRAIL)
+            if (sparklesTrail.length > 0) {
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                for (let i = sparklesTrail.length - 1; i >= 0; i--) {
+                    const st = sparklesTrail[i];
+                    st.x += st.vx;
+                    st.y += st.vy;
+                    st.alpha -= 0.035;
+
+                    if (st.alpha <= 0) {
+                        sparklesTrail.splice(i, 1);
+                        continue;
+                    }
+                    drawSparkle(ctx, st.x, st.y, st.size, st.color, st.alpha);
+                }
+                ctx.restore();
+            }
+        }
+        requestAnimationFrame(renderParticles);
+
+
+        /* =========================================================================
+           🎇 TƯƠNG TÁC CHUỘT & CẢM ỨNG (MOUSE & TOUCH MAGIC)
+           ========================================================================= */
+        function addSparkleTrail(x, y) {
+            for (let i = 0; i < 2; i++) {
+                sparklesTrail.push({
+                    x: x + (Math.random() - 0.5) * 12,
+                    y: y + (Math.random() - 0.5) * 12,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: Math.random() * 2 + 0.5,
+                    size: Math.random() * 3.5 + 1.2,
+                    color: GLOW_COLORS[Math.floor(Math.random() * GLOW_COLORS.length)],
+                    alpha: 1
+                });
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            addSparkleTrail(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches[0]) {
+                addSparkleTrail(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        // Click hoặc Chạm vào màn hình tạo pháo hoa trái tim mini
+        window.addEventListener('click', (e) => {
+            // Tránh bắn pháo hoa khi bấm vào các nút của player
+            if (e.target.closest('#music-player') || e.target.closest('#music-player-note')) return;
+            createHeartFirework(e.clientX, e.clientY, 35);
+        });
+
+
+        /* =========================================================================
+           🎬 QUY TRÌNH INTRO & HIỆU ỨNG GÕ CHỮ
+           ========================================================================= */
+        const introOverlay = document.getElementById('intro-overlay');
+        const mainContent = document.getElementById('main-content');
+        const messageElement = document.getElementById('main-message');
+        const nameElement = document.getElementById('name-element');
+        const finalWishElement = document.getElementById('final-wish');
+
+        let charIndex = 0;
+        function typeWriter() {
+            if (charIndex < mainMessageText.length) {
+                messageElement.innerHTML += mainMessageText.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 65);
+            } else {
+                messageElement.style.borderRight = 'none';
+
+                // Sau 0.4s, hiện tên người được chúc
+                setTimeout(() => {
+                    nameElement.classList.add('visible');
+
+                    // Hiện lời chúc yêu thương trọn vẹn ngay bên dưới để giữ đầy đủ nội dung
+                    setTimeout(() => {
+                        finalWishElement.innerHTML = finalWishContent;
+                        finalWishElement.classList.add('visible');
+                    }, 1200);
+
+                }, 400);
+            }
+        }
+
+        // Bắt đầu chuỗi Intro
+        function startIntro() {
+            initVortexParticles();
+            // Sau 2.2 giây xoáy tụ, kích hoạt SIÊU NỔ BÙNG SÁNG
+            setTimeout(() => {
+                triggerSupernova();
+            }, 2200);
+        }
+
+        // Khi kết thúc Intro: Chuyển tiếp mượt mà vào nội dung chính + TỰ ĐỘNG PHÁT NHẠC
+        function finishIntroSequence() {
+            if (isIntroFinished) return;
+            isIntroFinished = true;
+
+            // Làm mờ và ẩn lớp overlay
+            introOverlay.style.opacity = '0';
+            setTimeout(() => {
+                introOverlay.style.display = 'none';
+            }, 1200);
+
+            // Hiện thiệp chúc mừng
+            mainContent.classList.add('show');
+
+            // Bắt đầu hiệu ứng gõ chữ
+            setTimeout(() => {
+                typeWriter();
+            }, 300);
+
+            // 👉 TỰ ĐỘNG PHÁT NHẠC NGAY SAU KHI XONG INTRO Ở MỨC VOLUME 50%
+            playMusicWithCustomStart();
+        }
+
+        // Cho phép người dùng bấm vào màn hình mở quà ngay lập tức
+        introOverlay.addEventListener('click', () => {
+            if (introPhase === 'vortex') {
+                triggerSupernova();
+            }
+        });
+
+        window.addEventListener('load', () => {
+            startIntro();
+        });
+
+
+        /* =========================================================================
+           🎵 HỆ THỐNG TRÌNH PHÁT NHẠC (MUSIC PLAYER ENGINE HOÀN CHỈNH)
+           - Tự động chạy sau khi xong intro
+           - Âm lượng mặc định 50% (DEFAULT_VOLUME = 0.5)
+           - Tùy chỉnh nhạc bắt đầu từ startTime (giây)
+           - Khắc phục triệt để lỗi không thể Pause hoặc không thể chạy tiếp bài hát
+           ========================================================================= */
+        const audioPlayer = document.getElementById('audio-player');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const repeatBtn = document.getElementById('repeat-btn');
+        const coverArt = document.getElementById('cover-art');
+        const songTitle = document.getElementById('song-title');
+        const muteBtn = document.getElementById('mute-btn');
+        const volumeSlider = document.getElementById('volume-slider');
+        const musicPlayer = document.getElementById('music-player');
+        const musicPlayerNote = document.getElementById('music-player-note');
+        const progressBarBg = document.getElementById('progress-bar-bg');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const currentTimeEl = document.getElementById('current-time');
+        const totalDurationEl = document.getElementById('total-duration');
+        const playerToggleBtn = document.getElementById('player-toggle-btn');
+        const playerStatusText = document.getElementById('player-status-text');
+
+        let currentSongIndex = 0;
+        let isShuffling = false;
+        let repeatMode = 'off'; // 'off' | 'all' | 'one'
+        let lastVolume = DEFAULT_VOLUME;
+        let userInteractedWithControls = false;
+
+        // Thiết lập âm lượng ban đầu ở mức 50%
+        audioPlayer.volume = DEFAULT_VOLUME;
+        volumeSlider.value = DEFAULT_VOLUME;
+
+        // Định dạng thời gian (giây -> phút:giây)
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return '0:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // 🌟 LẮNG NGHE SỰ KIỆN TRỰC TIẾP TỪ THẺ AUDIO ĐỂ ĐỒNG BỘ GIAO DIỆN CHÍNH XÁC 100%
+        audioPlayer.addEventListener('play', () => {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            musicPlayer.classList.add('is-playing');
+            playerStatusText.textContent = 'Đang phát nhạc 50%';
+            hideNote();
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            musicPlayer.classList.remove('is-playing');
+            playerStatusText.textContent = 'Tạm dừng';
+        });
+
+        // Nạp bài hát & áp dụng startTime chuẩn xác
+function loadSong(index, shouldPlay = false) {
+            currentSongIndex = (index + playlist.length) % playlist.length;
+            const song = playlist[currentSongIndex];
+            
+            coverArt.src = song.cover;
+            songTitle.textContent = song.title;
+            progressBarFill.style.width = '0%';
+            currentTimeEl.textContent = formatTime(song.startTime || 0);
+
+            // Gán nguồn nhạc
+            audioPlayer.src = song.src;
+
+            const onMetadataLoaded = () => {
+                const start = song.startTime || 0;
+                if (start > 0 && start < audioPlayer.duration) {
+                    audioPlayer.currentTime = start;
+                }
+                totalDurationEl.textContent = formatTime(audioPlayer.duration);
+                currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+                
+                if (shouldPlay) {
+                    playMusic();
+                }
+                audioPlayer.removeEventListener('loadedmetadata', onMetadataLoaded);
+            };
+
+            // Chỉ cần lắng nghe loadedmetadata (rất nhanh, chỉ mất vài KB)
+            if (audioPlayer.readyState >= 1) {
+                onMetadataLoaded();
+            } else {
+                audioPlayer.addEventListener('loadedmetadata', onMetadataLoaded);
+            }
+        }
+
+        // Phát nhạc an toàn
+        function playMusic() {
+            if (audioPlayer.volume === 0 && lastVolume > 0) {
+                audioPlayer.volume = lastVolume;
+            } else if (audioPlayer.volume === 0) {
+                audioPlayer.volume = DEFAULT_VOLUME;
+            }
+            volumeSlider.value = audioPlayer.volume;
+            updateVolumeUI();
+
+            const playPromise = audioPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    hideNote();
+                }).catch(error => {
+                    console.warn("Chính sách trình duyệt cần chạm để bật nhạc:", error);
+                    showNote();
+                });
+            }
+        }
+    // Tự động phát nhạc sau khi hoàn thành Intro
+        function playMusicWithCustomStart() {
+            const song = playlist[currentSongIndex];
+            const start = song.startTime || 0;
+            
+            if (start > 0 && audioPlayer.currentTime !== start) {
+                try {
+                    audioPlayer.currentTime = start;
+                } catch (e) {
+                    console.log("Đang chờ stream audio...");
+                }
+            }
+            playMusic();
+            enableAutoplayUnlock();
+        }
+
+        // Dừng nhạc hoàn toàn
+        function pauseMusic() {
+            userInteractedWithControls = true;
+            audioPlayer.pause();
+        }
+
+        // Chuyển đổi giữa Phát và Tạm dừng (Toggle)
+        function togglePlayPause() {
+            userInteractedWithControls = true;
+            if (audioPlayer.paused) {
+                playMusic();
+            } else {
+                pauseMusic();
+            }
+        }
+
+        // Phát bài kế tiếp
+        function playNextSong() {
+            userInteractedWithControls = true;
+            if (isShuffling) {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * playlist.length);
+                } while (randomIndex === currentSongIndex && playlist.length > 1);
+                currentSongIndex = randomIndex;
+            } else {
+                currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            }
+            loadSong(currentSongIndex, true);
+        }
+
+        // Quay lại bài trước
+        function playPrevSong() {
+            userInteractedWithControls = true;
+            if (audioPlayer.currentTime > 3) {
+                const start = playlist[currentSongIndex].startTime || 0;
+                audioPlayer.currentTime = start;
+                return;
+            }
+            if (isShuffling) {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * playlist.length);
+                } while (randomIndex === currentSongIndex && playlist.length > 1);
+                currentSongIndex = randomIndex;
+            } else {
+                currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+            }
+            loadSong(currentSongIndex, true);
+        }
+
+        function toggleShuffle() {
+            isShuffling = !isShuffling;
+            shuffleBtn.classList.toggle('active', isShuffling);
+        }
+
+        function toggleRepeat() {
+            if (repeatMode === 'off') {
+                repeatMode = 'all';
+                repeatBtn.classList.add('active');
+                repeatBtn.innerHTML = '<i class="fas fa-repeat"></i>';
+            } else if (repeatMode === 'all') {
+                repeatMode = 'one';
+                repeatBtn.classList.add('active');
+                repeatBtn.innerHTML = '<i class="fas fa-1" style="font-size: 0.9rem;"></i>';
+            } else {
+                repeatMode = 'off';
+                repeatBtn.classList.remove('active');
+                repeatBtn.innerHTML = '<i class="fas fa-repeat"></i>';
+            }
+        }
+
+        // Cập nhật thanh tiến độ theo thời gian bài hát
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (audioPlayer.duration) {
+                const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progressBarFill.style.width = `${percent}%`;
+                currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+                totalDurationEl.textContent = formatTime(audioPlayer.duration);
+            }
+        });
+
+        // Tua nhạc trực tiếp khi nhấp/chạm vào thanh tiến độ
+        progressBarBg.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userInteractedWithControls = true;
+            const rect = progressBarBg.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = rect.width;
+            if (audioPlayer.duration) {
+                audioPlayer.currentTime = Math.max(0, Math.min(audioPlayer.duration, (clickX / width) * audioPlayer.duration));
+            }
+        });
+
+        // Tự động phát tiếp khi bài hát kết thúc
+        audioPlayer.addEventListener('ended', () => {
+            if (repeatMode === 'one') {
+                const start = playlist[currentSongIndex].startTime || 0;
+                audioPlayer.currentTime = start;
+                playMusic();
+            } else if (repeatMode === 'all') {
+                playNextSong();
+            } else {
+                if (currentSongIndex === playlist.length - 1 && !isShuffling) {
+                    pauseMusic();
+                } else {
+                    playNextSong();
+                }
+            }
+        });
+
+        // GẮN SỰ KIỆN NÚT BẤM (CÓ CHẶN BUBBLE ĐỂ KHÔNG BỊ CONFLICT VỚI DOCUMENT CLICK)
+        playPauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePlayPause();
+        });
+
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playPrevSong();
+        });
+
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playNextSong();
+        });
+
+        shuffleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleShuffle();
+        });
+
+        repeatBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleRepeat();
+        });
+
+        // Nút Mute / Bật tiếng
+        muteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userInteractedWithControls = true;
+            if (audioPlayer.volume > 0) {
+                lastVolume = audioPlayer.volume;
+                audioPlayer.volume = 0;
+                volumeSlider.value = 0;
+            } else {
+                audioPlayer.volume = lastVolume > 0 ? lastVolume : DEFAULT_VOLUME;
+                volumeSlider.value = audioPlayer.volume;
+            }
+            updateVolumeUI();
+            hideNote();
+        });
+
+        // Thanh trượt âm lượng
+        volumeSlider.addEventListener('input', (e) => {
+            e.stopPropagation();
+            userInteractedWithControls = true;
+            audioPlayer.volume = parseFloat(volumeSlider.value);
+            if (audioPlayer.volume > 0) {
+                lastVolume = audioPlayer.volume;
+            }
+            updateVolumeUI();
+            hideNote();
+        });
+
+        volumeSlider.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        function updateVolumeUI() {
+            if (audioPlayer.volume === 0) {
+                muteBtn.innerHTML = '<i class="fas fa-volume-xmark"></i>';
+            } else if (audioPlayer.volume < 0.5) {
+                muteBtn.innerHTML = '<i class="fas fa-volume-low"></i>';
+            } else {
+                muteBtn.innerHTML = '<i class="fas fa-volume-high"></i>';
+            }
+        }
+
+        function showNote() {
+            musicPlayerNote.classList.add('show');
+        }
+
+        function hideNote() {
+            musicPlayerNote.classList.remove('show');
+        }
+
+        musicPlayerNote.addEventListener('click', (e) => {
+            e.stopPropagation();
+            playMusic();
+            hideNote();
+        });
+
+        // Mở khóa âm thanh lần đầu nếu trình duyệt chặn autoplay
+        function enableAutoplayUnlock() {
+            const unlockHandler = (e) => {
+                // Nếu người dùng đã tự tương tác với player thì không can thiệp
+                if (userInteractedWithControls) return;
+                if (e.target.closest('#music-player')) return;
+                if (audioPlayer.paused) {
+                    playMusic();
+                }
+            };
+            document.addEventListener('click', unlockHandler, { once: true });
+            document.addEventListener('touchstart', unlockHandler, { once: true, passive: true });
+        }
+
+        // Tự động phát khi kết thúc Intro có áp dụng startTime
+        function playMusicWithCustomStart() {
+            const song = playlist[currentSongIndex];
+            const start = song.startTime || 0;
+            if (audioPlayer.readyState >= 1 && start > 0) {
+                audioPlayer.currentTime = start;
+            }
+            playMusic();
+            enableAutoplayUnlock();
+        }
+
+        // Nút thu nhỏ / mở rộng player trên điện thoại
+        playerToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            musicPlayer.classList.toggle('minimized');
+        });
+
+        musicPlayer.addEventListener('click', (e) => {
+            if (musicPlayer.classList.contains('minimized')) {
+                musicPlayer.classList.remove('minimized');
+            }
+        });
+
+        // Khởi tạo nạp bài đầu tiên
+        loadSong(currentSongIndex, false);
+    </script>
+</body>
+</html>
